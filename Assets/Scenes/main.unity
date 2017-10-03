@@ -149,7 +149,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _parameters:
-    size: 63
+    size: 64
     scale: 400
     octaves: 7
     persistance: 1
