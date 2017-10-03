@@ -14,11 +14,12 @@ ExportedObj/
 *.tmp
 *.user
 *.userprefs
+*.ide
 *.pidb
 *.booproj
 *.svd
-*.ide
-
+*.orig
+*.orig.meta
 
 # Unity3D generated meta files
 *.pidb.meta
