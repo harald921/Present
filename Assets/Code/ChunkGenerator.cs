@@ -121,6 +121,8 @@ public class ChunkGenerator
         MeshFilter filter = newGO.AddComponent<MeshFilter>();
         MeshRenderer renderer = newGO.AddComponent<MeshRenderer>();
 
+        renderer.material.SetFloat("_Glossiness", 0.0f);
+
         filter.mesh = inChunkMesh;
 
         return newGO;
