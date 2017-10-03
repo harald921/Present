@@ -144,5 +144,6 @@ public class WorldGenerator : MonoBehaviour
 /*
  *  - Make the world generate in a rectangle again, since the camera is orthographic
  *  - Instantiate all chunk GO's on program start and reuse them to increase performance and counter memory leak
+ *  - Make the entire game OOP
  *  
  */
