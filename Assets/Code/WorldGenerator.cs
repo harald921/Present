@@ -138,3 +138,11 @@ public class WorldGenerator : MonoBehaviour
         yield return null;
     }
 }
+
+
+// TO-DO List
+/*
+ *  - Make the world generate in a rectangle again, since the camera is orthographic
+ *  - Instantiate all chunk GO's on program start and reuse them to increase performance and counter memory leak
+ *  
+ */
