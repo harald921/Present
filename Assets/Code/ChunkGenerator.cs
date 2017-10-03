@@ -27,7 +27,7 @@ public class ChunkGenerator
 
         _chunkMesh = GenerateChunkMesh(_parameters.size);
 
-        _noiseGenerator   = new NoiseGenerator(this);
+        _noiseGenerator   = new NoiseGenerator();
         _textureGenerator = new TextureGenerator(this, inParameters.size);
     }
 
@@ -147,19 +147,10 @@ public class ChunkGenerator
 
 public class NoiseGenerator
 {
-    readonly ChunkGenerator _chunkGenerator;
-
     public class Result
     {
         public float[,] heightMap;
     }
-
-
-    public NoiseGenerator(ChunkGenerator inChunkGenerator)
-    {
-        _chunkGenerator = inChunkGenerator;
-    }
-
 
     public void Generate(Result inResult, Noise.Parameters inParameters, Vector2 inOffset, Chunk inChunk)
     {
