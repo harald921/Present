@@ -1,180 +1,273 @@
 ﻿using UnityEngine;
+
+using System;
+using System.Threading;
 using System.Collections;
 using System.Collections.Generic;
 
 public class ChunkGenerator
 {
-    NoiseSettings.Parameters _noiseParameters;
+    public Noise.Parameters _parameters { private get; set; }
 
-    NoiseThreader   _noiseGenerator;
-    MeshThreader    _meshGenerator;
-    TextureThreader _textureGenerator;
+    NoiseGenerator   _noiseGenerator;
+    MeshGenerator    _meshGenerator;
+    TextureGenerator _textureGenerator;
 
-    Mesh _mesh = new Mesh();
+    public Queue<Action> _meshThreadInfoQueue    = new Queue<Action>();
+    public Queue<Action> _textureThreadInfoQueue = new Queue<Action>();
 
-    // Constructor
-    public ChunkGenerator(NoiseSettings.Parameters inNoiseParameters)
+    Transform _worldTransform;
+
+    public ChunkGenerator(Noise.Parameters inParemeters)
     {
-        _noiseParameters = inNoiseParameters;
+        _worldTransform = GameObject.Find("World").transform;
 
-        _noiseGenerator   = new NoiseThreader();
-        _meshGenerator    = new MeshThreader(inNoiseParameters.size);
-        _textureGenerator = new TextureThreader(inNoiseParameters.size, 32, GameObject.Find("World").GetComponent<TextureGenerator>());
+        _parameters = inParemeters;
 
-        CreateCachedMesh();
+        _noiseGenerator   = new NoiseGenerator(this);
+        _meshGenerator    = new MeshGenerator(this, inParemeters.size);
+        _textureGenerator = new TextureGenerator(this, inParemeters.size);
     }
+
 
     // External
+    public void Update()
+    {
+        ProcessQueues();
+    }
+
     public Chunk GenerateChunk(Vector2 inOffset)
     {
-        // Generate noisemap
-        float[,] newNoiseMap = Noise.Generate(_noiseParameters, inOffset);
+        GameObject newGO = new GameObject(inOffset.ToString());
+        newGO.transform.SetParent(_worldTransform);
+        newGO.transform.position = new Vector3(inOffset.x * _parameters.size, 0, -inOffset.y * _parameters.size);
 
-        // Create new GameObject, set position and name
-        GameObject newGO = new GameObject();
-        newGO.transform.position = new Vector3(inOffset.x * _noiseParameters.size, 0, -inOffset.y * _noiseParameters.size);
-        newGO.name = inOffset.ToString();
+        newGO.AddComponent<MeshFilter>();
+        newGO.AddComponent<MeshRenderer>();
 
-        // Set mesh of GameObject
-        MeshFilter meshFilter = newGO.AddComponent<MeshFilter>();
-        meshFilter.mesh = _mesh;
+        Chunk newChunk = new Chunk(newGO);
 
-        // Generate and set texture of GameObject
-        MeshRenderer meshRenderer = newGO.AddComponent<MeshRenderer>();
-        meshRenderer.material.mainTexture = _textureGenerator.Generate(newNoiseMap);
-        meshRenderer.material.SetFloat("_Glossiness", 0.0f);
+        new Thread(() => GenerateChunkData(inOffset, newChunk)).Start();
 
-        return new Chunk(newGO);
+        return newChunk;
     }
 
-    public void GenerateChunk(NoiseSettings.Parameters inNoiseParameters, Vector2 inOffset, Chunk inChunk)
-    {
-        _noiseParameters = inNoiseParameters;
-
-        float[,] newNoiseMap = Noise.Generate(inNoiseParameters, inOffset);
-
-        inChunk.gameObject.GetComponent<MeshRenderer>().material.mainTexture = _textureGenerator.Generate(newNoiseMap);
-    }
 
     // Internal
-    void CreateCachedMesh()
+    void ProcessQueues()
     {
-        MeshThreader.MeshData meshData = _meshGenerator.Generate();
-        _mesh.vertices  = meshData.vertices;
-        _mesh.uv        = meshData.uv;
-        _mesh.triangles = meshData.triangles;
+        while (_meshThreadInfoQueue.Count > 0)
+            _meshThreadInfoQueue.Dequeue()();
 
-        _mesh.RecalculateNormals();
+        while (_textureThreadInfoQueue.Count > 0)
+            _textureThreadInfoQueue.Dequeue()();
+    }
+
+    void GenerateChunkData(Vector2 inOffset, Chunk inChunk)
+    {
+        NoiseGenerator.Result noiseResult = new NoiseGenerator.Result();
+        Thread noiseThread = new Thread(() => _noiseGenerator.Generate(noiseResult, _parameters, inOffset, inChunk));
+
+        noiseThread.Start();
+        noiseThread.Join();
+
+        new Thread(() => _meshGenerator.Generate(noiseResult, inChunk)).Start();
+        new Thread(() => _textureGenerator.Generate(noiseResult, inChunk)).Start();
+    }
+
+    public void OnMeshDataRecieved(MeshGenerator.Result inResult, Chunk inChunk)
+    {
+        if (!inChunk.gameObject)
+            return;
+
+        Mesh generatedMesh      = inChunk.gameObject.GetComponent<MeshFilter>().mesh;
+        generatedMesh.vertices  = inResult.meshData.vertices;
+        generatedMesh.uv        = inResult.meshData.uv;
+        generatedMesh.triangles = inResult.meshData.triangles;
+        
+        generatedMesh.RecalculateNormals(); // http://schemingdeveloper.com/2014/10/17/better-method-recalculate-normals-unity/
+
+        inChunk.gameObject.GetComponent<MeshFilter>().mesh = generatedMesh;
+    }
+
+    public void OnTextureDataRecieved(TextureGenerator.Result inResult, Chunk inChunk)
+    {
+        if (!inChunk.gameObject)
+            return;
+
+        Texture2D newTexture = new Texture2D(_parameters.size, _parameters.size);
+        newTexture.filterMode = FilterMode.Point;
+        newTexture.SetPixels(inResult.pixels);
+        newTexture.Apply();
+
+        inChunk.gameObject.GetComponent<MeshRenderer>().material.mainTexture = newTexture;
     }
 }
 
 
 
 
-
-
-public class NoiseThreader
+public class NoiseGenerator
 {
-    public float[,] Generate(NoiseSettings.Parameters inNoiseParameters, Vector2 inOffset)
+    readonly ChunkGenerator _chunkGenerator;
+
+    public class Result
     {
-        return Noise.Generate(inNoiseParameters, inOffset);
+        public float[,] heightMap;
+    }
+
+
+    public NoiseGenerator(ChunkGenerator inChunkGenerator)
+    {
+        _chunkGenerator = inChunkGenerator;
+    }
+
+
+    public void Generate(Result inResult, Noise.Parameters inParameters, Vector2 inOffset, Chunk inChunk)
+    {
+        inResult.heightMap = Noise.Generate(inParameters, inOffset);
     }
 }
 
-public class MeshThreader
+
+
+
+public class MeshGenerator
 {
+    readonly ChunkGenerator _chunkGenerator;
+
+    public class Result
+    {
+        public MeshData meshData;
+    }
+
+    readonly int vertexSize;
+    readonly int vertexCount;
+
     public struct MeshData
     {
         public Vector3[] vertices;
         public Vector2[] uv;
-        public int[] triangles;
+        public int[]     triangles;
     }
-    readonly MeshData _meshData;
+    MeshData meshData;
 
-    readonly int _size;
-    readonly int _tileCount;
-    readonly int _triangleCount;
-    readonly int _vertexSize;
-    readonly int _vertexCount;
-
-    public MeshThreader(int inSize)
+    public MeshGenerator(ChunkGenerator inChunkGenerator, int inSize)
     {
-        _size          = inSize;
-        _tileCount     = _size * _size;
-        _triangleCount = _tileCount * 2;
-        _vertexSize    = _size + 1;
-        _vertexCount   = _vertexSize * _vertexSize;
+        _chunkGenerator = inChunkGenerator;
 
-        _meshData.vertices  = new Vector3[_vertexCount];
-        _meshData.uv        = new Vector2[_vertexCount];
-        _meshData.triangles = new int[_triangleCount * 3];
+        vertexSize    = inSize + 1;
+        vertexCount   = vertexSize * vertexSize;
 
-        // Generate vertices and UV
-        for (int z = 0; z < _vertexSize; z++)
-            for (int x = 0; x < _vertexSize; x++)
+        meshData = new MeshData()
+        {
+            uv         = new Vector2[vertexCount],
+            triangles = new int[inSize * inSize * 6]
+        };
+
+        // Generate the normals and UVs
+        for (int y = 0; y < vertexSize; y++)
+            for (int x = 0; x < vertexSize; x++)
+                meshData.uv[y * vertexSize + x] = new Vector2((float)x / inSize, (float)y / inSize);
+
+        // Generate the triVertID's
+        bool diagonal = false;
+        for (int y = 0; y < inSize; y++)
+        {
+            for (int x = 0; x < inSize; x++)
             {
-                int currentIndex = z * _vertexSize + x;
-
-                _meshData.vertices[currentIndex] = new Vector3(x, 0, z);
-                _meshData.uv[currentIndex] = new Vector2((float)x / _size, (float)z / _size); // TODO: Rewrite this so that division isn't used
-            }
-
-        // Generate the triangles
-        for (int z = 0; z < _size; z++)
-            for (int x = 0; x < _size; x++)
-            {
-                int currentTileID = z * _size + x;
-                int triVertOffset = z * _vertexSize + x;
+                int currentTileID = y * inSize + x;
+                int triVertOffset = y * vertexSize + x;
                 int triangleOffset = currentTileID * 6;
 
-                _meshData.triangles[triangleOffset + 0] = triVertOffset + 0;
-                _meshData.triangles[triangleOffset + 1] = triVertOffset + _vertexSize + 0;
-                _meshData.triangles[triangleOffset + 2] = triVertOffset + _vertexSize + 1;
+                if (diagonal)
+                {
+                    meshData.triangles[triangleOffset + 0] = triVertOffset + 0;
+                    meshData.triangles[triangleOffset + 1] = triVertOffset + vertexSize + 0;
+                    meshData.triangles[triangleOffset + 2] = triVertOffset + vertexSize + 1;
+                    meshData.triangles[triangleOffset + 3] = triVertOffset + 0;
+                    meshData.triangles[triangleOffset + 4] = triVertOffset + vertexSize + 1;
+                    meshData.triangles[triangleOffset + 5] = triVertOffset + 1;
+                }
 
-                _meshData.triangles[triangleOffset + 3] = triVertOffset + 0;
-                _meshData.triangles[triangleOffset + 4] = triVertOffset + _vertexSize + 1;
-                _meshData.triangles[triangleOffset + 5] = triVertOffset + 1;
+                else
+                {
+                    meshData.triangles[triangleOffset + 0] = triVertOffset + 0;
+                    meshData.triangles[triangleOffset + 1] = triVertOffset + vertexSize + 0;
+                    meshData.triangles[triangleOffset + 2] = triVertOffset + 1;
+                    meshData.triangles[triangleOffset + 3] = triVertOffset + 1;
+                    meshData.triangles[triangleOffset + 4] = triVertOffset + vertexSize + 0;
+                    meshData.triangles[triangleOffset + 5] = triVertOffset + vertexSize + 1;
+                }
+
+                diagonal = !diagonal;
             }
+        }
     }
 
-    public MeshData Generate()
+
+    public void Generate(NoiseGenerator.Result inNoiseResult, Chunk inChunk)
     {
-        return _meshData;
+        MeshData newMeshData = new MeshData()
+        {
+            vertices = new Vector3[vertexCount],
+            uv = meshData.uv,
+            triangles = meshData.triangles
+        };
+
+        // Generate the vertices of the mesh
+        for (int y = 0; y < vertexSize; y++)
+            for (int x = 0; x < vertexSize; x++)
+            {
+                int iteration = y * vertexSize + x;
+
+                newMeshData.vertices[iteration].x = x;
+                newMeshData.vertices[iteration].y = inNoiseResult.heightMap[x,y] * 100;
+                newMeshData.vertices[iteration].z = y;
+            }
+
+        Result result = new Result();
+        result.meshData = newMeshData;
+
+        lock (_chunkGenerator._meshThreadInfoQueue)
+            _chunkGenerator._meshThreadInfoQueue.Enqueue(() => _chunkGenerator.OnMeshDataRecieved(result, inChunk));
     }
 }
 
-public class TextureThreader
+
+
+
+public class TextureGenerator
 {
-    TextureGenerator _textureGenerator;
+    readonly ChunkGenerator _chunkGenerator;
 
-    readonly int _size;
-    readonly int _tileSize;
-    readonly Color[] _pixels;
-
-    public TextureThreader(int inSize, int inTileSize, TextureGenerator inTextureGenerator)
+    public class Result
     {
-        _textureGenerator = inTextureGenerator;
-
-        _size = inSize;
-        _tileSize = inTileSize;
-        _pixels = new Color[_size * _size * _tileSize * _tileSize];
+        public Color[] pixels;
     }
 
-    public Texture2D Generate(float[,] inNoiseMap)
+    readonly int size;
+
+    public TextureGenerator(ChunkGenerator inChunkGenerator, int inSize)
     {
-        int sizeTimesTileSize = _size * _tileSize;
-        Texture2D newTexture = new Texture2D(sizeTimesTileSize, sizeTimesTileSize);
+        _chunkGenerator = inChunkGenerator;
 
-        for (int y = 0; y < _size; y++)
-            for (int x = 0; x < _size; x++)
-            {
-                newTexture.SetPixels(x * _tileSize, y * _tileSize, _tileSize, _tileSize, _textureGenerator.GetSpritePixels(0));
+        size = inSize;
+    }
 
-            }
 
-        newTexture.filterMode = FilterMode.Point;
-        newTexture.Apply();
+    public void Generate(NoiseGenerator.Result inNoiseResult, Chunk inChunk)
+    {
+        Color[] pixels = new Color[size * size];
 
-        return newTexture;
+        for (int y = 0; y < size; y++)
+            for (int x = 0; x < size; x++)
+                pixels[y * size + x] = Color.Lerp(Color.black, Color.white, inNoiseResult.heightMap[x,y]);
+
+        Result result = new Result();
+        result.pixels = pixels;
+
+        lock (_chunkGenerator._textureThreadInfoQueue)
+            _chunkGenerator._textureThreadInfoQueue.Enqueue(() => _chunkGenerator.OnTextureDataRecieved(result, inChunk));
     }
 }

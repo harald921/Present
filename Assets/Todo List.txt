@@ -1,0 +1,23 @@
+﻿/* TODO LIST */
+High Prio:
+	- Modify the terrain generation so that it fits a first person perspective
+	
+Med Prio:
+	- Add in basic inventory
+	- Add in the ability to cut down trees and mine stones
+	- Add in ability to build campfire and small shelter
+	
+Low Prio:
+	- Add the ability to modify the terrain
+	- Make each tile have its own tile type
+	- Add save to disk / Load from disk
+	- Implement thermal erosion
+	- Implement hydraulic eriosion
+	- Make Regenerate work with Chunk Objects
+	- Create a few more interesting biomes using the BiomeManager
+	- Create a better system for spawning chunk objects
+	
+Finished:
+	- Refactor te spawning of trees and towns. ChunkGenerator should handle all that stuff.
+	- Make trees combine into single mesh
+	

@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class Chunk 
+public class Chunk
 {
     GameObject _gameObject;
     public GameObject gameObject
@@ -10,8 +10,8 @@ public class Chunk
         get { return _gameObject; }
     }
 
-    public Chunk(GameObject inGameObject)
+    public Chunk(GameObject inChunkGO)
     {
-        _gameObject = inGameObject;
+        _gameObject = inChunkGO;
     }
 }

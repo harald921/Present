@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class NoiseSettings : MonoBehaviour
+public class Noise : MonoBehaviour
 {
     [System.Serializable]
     public struct Parameters
@@ -25,22 +25,21 @@ public class NoiseSettings : MonoBehaviour
     public Parameters parameters
     {
         get { return _parameters; }
-    }
-}
 
-public class Noise
-{
+        private set { _parameters = value; }
+    }
+
     /* External Methods */
-    public static float[,] Generate(NoiseSettings.Parameters inParameters, Vector2 inOffset)
+    public static float[,] Generate(Parameters inParameters, Vector2 inOffset)
     {
         // Cache all the parameters
-        int   size           = inParameters.size;
-        int   scale          = inParameters.scale;
-        int   octaves        = inParameters.octaves;
-        float persistance    = inParameters.persistance;
-        float lacunarity     = inParameters.lacunarity;
-        float redistribution = inParameters.redistribution;
-        int   seed           = inParameters.seed;
+        int   size            = inParameters.size;
+        int   scale           = inParameters.scale;
+        int   octaves         = inParameters.octaves;
+        float persistance     = inParameters.persistance;
+        float lacunarity      = inParameters.lacunarity;
+        float redistribution  = inParameters.redistribution;
+        int   seed            = inParameters.seed;
 
         float maxPossibleHeight = 0;
         float amplitude = 1;
@@ -98,3 +97,4 @@ public class Noise
         return noiseMap;
     }
 }
+ 
