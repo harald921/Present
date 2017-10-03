@@ -7,7 +7,7 @@ public class WorldGenerator : MonoBehaviour
     Noise.Parameters _parameters;
     ChunkGenerator _chunkGenerator;
 
-    [SerializeField] int _radius = 3;
+    [SerializeField] int _renderDistance = 3;
 
     Dictionary<Vector2, Chunk> _worldChunks = new Dictionary<Vector2, Chunk>();
     List<Vector2> _chunksToGenerate = new List<Vector2>();
@@ -89,16 +89,14 @@ public class WorldGenerator : MonoBehaviour
 
     void OnCameraChunkEnter(Vector2 inChunkCoord)
     {
-        int chunksToSide = (_radius - 1) / 2;
+        int chunksToSide = (_renderDistance - 1) / 2;
 
         List<Vector2> visibleChunkCoords = new List<Vector2>();
 
         // Calculate the coordinates of all the chunks that are within the radius
-        for (int zCircle = -_radius; zCircle <= _radius; zCircle++)
-            for (int xCircle = -_radius; xCircle <= _radius; xCircle++)
-                if (xCircle * xCircle + zCircle * zCircle < _radius * _radius)
-                    visibleChunkCoords.Add(new Vector2(xCircle - chunksToSide + inChunkCoord.x, 
-                                                       zCircle - chunksToSide + inChunkCoord.y));
+        for (int y = 0; y < _renderDistance; y++)
+            for (int x = 0; x < _renderDistance; x++)
+                visibleChunkCoords.Add(new Vector2(x - chunksToSide + inChunkCoord.x, y - chunksToSide + inChunkCoord.y));
         
         // Add all the visible chunks to the delete queue
         _chunksToDelete.Clear();
@@ -142,7 +140,6 @@ public class WorldGenerator : MonoBehaviour
 
 // TO-DO List
 /*
- *  - Make the world generate in a rectangle again, since the camera is orthographic
  *  - Instantiate all chunk GO's on program start and reuse them to increase performance and counter memory leak
  *  - Make the entire game OOP
  *  
