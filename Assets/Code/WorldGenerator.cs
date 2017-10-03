@@ -68,6 +68,7 @@ public class WorldGenerator : MonoBehaviour
         {
             Destroy(_worldChunks[_chunksToDelete[0]].gameObject.GetComponent<MeshFilter>().mesh);
             Destroy(_worldChunks[_chunksToDelete[0]].gameObject.GetComponent<MeshRenderer>().material.mainTexture);
+            Destroy(_worldChunks[_chunksToDelete[0]].gameObject.GetComponent<MeshRenderer>().material);
 
             Destroy(_worldChunks[_chunksToDelete[0]].gameObject);
             _worldChunks.Remove(_chunksToDelete[0]);
