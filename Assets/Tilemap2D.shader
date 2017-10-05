@@ -3,8 +3,8 @@ Shader "Tilemap/Tilemap2D"
 	Properties 
 	{
 		_SpriteSheet ("Sprite Sheet", 2D) = "black" {}						 // The sprite sheet
-		_DataMap ("DataMap", 2D) 		  = "black" {}						 // The data map
-		_SpriteSheetSize ("SheetSize, SpriteCount", vector) = (0,0,0,0)      // Sprite count and sprite sheet dimensions 
+		_DataMap ("DataMap", 2D) 		  = "black" {}						 // The texture containing the pixels
+		_SpriteSheetSize ("SheetSize, SpriteCount", vector) = (0,0,0,0)      // The pixel dimensions of the sprite sheet, and the sprite dimensions of the sprite sheet
 	}
 
 	SubShader 
@@ -49,7 +49,7 @@ Shader "Tilemap/Tilemap2D"
 				
 				float2 bias = float2(-0.001, 0);
 				
-				return tex2D(_SpriteSheet, spriteIndex.xy + spriteOffset+bias);
+				return tex2D(_SpriteSheet, spriteIndex + spriteOffset + bias);
 			}
 			
 			ENDCG

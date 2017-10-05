@@ -36,6 +36,22 @@ public class Tilemap2D : MonoBehaviour
 
 		tilemapMaterial.SetVector("_SpriteSheetSize",new Vector4(width, height, _spriteCount.x, _spriteCount.y));
 	}
+
+    void Update()
+    {
+        if (Input.GetKey(KeyCode.Space))
+        {
+            Material tilemapMaterial = GetComponent<MeshRenderer>().material;
+
+            // Create a data texture
+            Texture2D dataTexture = (Texture2D)tilemapMaterial.GetTexture("_DataMap");
+            for (int x = 0; x < _chunkSize; x++)
+                for (int y = 0; y < _chunkSize; y++)
+                    dataTexture.SetPixel(x, y, new Color(Random.Range(0, 4) / _spriteCount.x, 0, 0, 0));
+
+            dataTexture.Apply();
+        }
+    }
 }
 
 
