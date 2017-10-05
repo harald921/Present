@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Tilemap2D
+  m_Shader: {fileID: 4800000, guid: 2472131a9ff538943909817368ae1247, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: 30e2838e48fb0744880b5bb97d9481f5, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Tilemap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats: []
+    m_Colors:
+    - _MapSize: {r: 64, g: 64, b: 8, a: 8}
+    - _OrthoSize: {r: 0, g: 0, b: 0, a: 0}
+    - _OrthoSize2: {r: 0, g: 0, b: 0, a: 0}
+    - _Position: {r: 0, g: 0, b: 0, a: 0}
+    - _ScreenSize: {r: 400, g: 400, b: 0, a: 0}
+    - _Size: {r: 0, g: 0, b: 0, a: 0}
+    - _TileSize: {r: 8, g: 8, b: 0, a: 0}
+    - _TilesetSize: {r: 64, g: 64, b: 8, a: 8}
+--- !u!1002 &2100001
+EditorExtensionImpl:
+  serializedVersion: 6
