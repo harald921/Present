@@ -18,15 +18,49 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _BaseAtlas:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DataMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 2800000, guid: 30e2838e48fb0744880b5bb97d9481f5, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _P1Atlas:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _P2Atlas:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SpriteSheet:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SubBaseAtlas:
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Tilemap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    m_Floats: []
+    - _TilemapBase:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TilemapP1P2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _DataMapSize: 0
+    - _SpriteSheetSize: 0
     m_Colors:
     - _MapSize: {r: 64, g: 64, b: 8, a: 8}
     - _OrthoSize: {r: 0, g: 0, b: 0, a: 0}
@@ -34,7 +68,10 @@ Material:
     - _Position: {r: 0, g: 0, b: 0, a: 0}
     - _ScreenSize: {r: 400, g: 400, b: 0, a: 0}
     - _Size: {r: 0, g: 0, b: 0, a: 0}
+    - _SpriteSheetSize: {r: 0, g: 0, b: 0, a: 0}
     - _TileSize: {r: 8, g: 8, b: 0, a: 0}
+    - _TilemapScale: {r: 0, g: 0, b: 0, a: 1}
+    - _TilemapSize: {r: 0, g: 0, b: 0, a: 1}
     - _TilesetSize: {r: 64, g: 64, b: 8, a: 8}
 --- !u!1002 &2100001
 EditorExtensionImpl:

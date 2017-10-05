@@ -26,15 +26,9 @@ public class Tilemap2D : MonoBehaviour
         // Send the tilemap and the data texture to the material
         Material tilemapMaterial = GetComponent<MeshRenderer>().material;
 		tilemapMaterial.SetTexture("_SpriteSheet", spriteSheet);
+        tilemapMaterial.SetFloat("_SpriteSheetSize", spriteSheet.width);
 		tilemapMaterial.SetTexture("_DataMap", dataTexture);
-
-        int width, height;
-        if (spriteSheet.width > spriteSheet.height)
-            width = height = spriteSheet.width;
-        else
-            width = height = spriteSheet.height;
-
-		tilemapMaterial.SetVector("_SpriteSheetSize",new Vector4(width, height, _spriteCount.x, _spriteCount.y));
+		tilemapMaterial.SetFloat("_DataMapSize", dataTexture.width);
 	}
 
     void Update()
