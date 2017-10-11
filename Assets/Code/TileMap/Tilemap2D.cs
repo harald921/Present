@@ -18,7 +18,7 @@ public class Tilemap2D : MonoBehaviour
         Texture2D dataTexture = new Texture2D(_chunkSize, _chunkSize);
         for (int x = 0; x <_chunkSize; x++)
 			for (int y = 0; y <_chunkSize; y++)
-				dataTexture.SetPixel(x, y, new Color(Random.Range(0, 4) / _spriteCount.x ,0,0,0));
+				    dataTexture.SetPixel(x, y, new Color(Random.Range(0, 8) / _spriteCount.x ,0,0,0));
 
         dataTexture.filterMode = FilterMode.Point;
 		dataTexture.Apply();
