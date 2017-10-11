@@ -1,23 +1,36 @@
 ﻿/* TODO LIST */
-High Prio:
-	- Modify the terrain generation so that it fits a first person perspective
-	
-Med Prio:
-	- Add in basic inventory
-	- Add in the ability to cut down trees and mine stones
-	- Add in ability to build campfire and small shelter
-	
-Low Prio:
-	- Add the ability to modify the terrain
-	- Make each tile have its own tile type
-	- Add save to disk / Load from disk
-	- Implement thermal erosion
-	- Implement hydraulic eriosion
-	- Make Regenerate work with Chunk Objects
-	- Create a few more interesting biomes using the BiomeManager
-	- Create a better system for spawning chunk objects
-	
-Finished:
-	- Refactor te spawning of trees and towns. ChunkGenerator should handle all that stuff.
-	- Make trees combine into single mesh
-	
+
+// Data-Logic layers
+- Make class that acts as a layer between graphics and logic. This class should take in an array of all tiles visible to the player and create a data texture based upon that and send to the GPU.
+  Every simulated tile in the game should be available in memory as a "Tile" class, which holds data such as: Base material, dropped items, and "furniture" (walls, doors, etc.)
+- Make a class that is a pure data layer of the game. Define every tile type, and let it have flags such as "impassable" or similar.
+- Create a method that takes in an enum (such as "TileType.Grass") and returns the "color value" of a random grass tile. This method should also handle rotating and such, whenever that is implemented.
+
+// Graphics layers
+- Add 5 layers in total:
+	1) Base layer: Holds the terrain type such as "water, grass, mud, sand". This is rendered in the bottom.
+	2) Floor layer: Holds the different flooring the player can create, such as "mud path, brick road, cobblestone path", etc.
+	3) Item layer: Holds all the different items and stuff that may or may not stack, be dropped and picked up, etc. 
+	4) Furniture layer: Holds all the different static items such as trees, rocks, walls, chairs, beds, etc.
+	5) Character layer: Holds all the different characters and vehicles, such as the player, animals, boats, wheelbarrows, etc.
+
+
+// Gameplay
+- Create a character that can walk around on the visible chunk. Stay with one chunk for now
+- Make it possible to turn trees into grass tiles by walking over them
+- Make trees give the player "wood" which he then can place in a chosen direction by pressing a number on the numpad
+- Make the game generate chunks so that the player can travel infinitely in a direction
+- Make the chunks get generated from noise rather than pure randomness
+	- Create a way to preview noise in a 1:10 scale or something
+- Implement basic biomes
+
+// Rotating sprites
+- Figure out how to rotate sprites in the tilemap shader
+
+// Other graphics
+- Figure out how to properly calculate how tiles should affect eachother graphically when placed next to eachother. For example, water placed next to grass should have a slight patch of dirt in the direction of the grass in order to
+  seamlessly blend in.
+- Figure out how to make smooth transitions between tiles that should have smooth transitions, such as grass-sand
+
+// Dev and Debugging
+- Make it possible to pick a tile of choise and "paint" them using the cursor. This should purely affect the data layer.
