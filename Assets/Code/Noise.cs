@@ -56,8 +56,6 @@ public class Noise : MonoBehaviour
             amplitude *= persistance;
         }
 
-        size += 1;
-
         float[,] noiseMap = new float[size, size];
 
         float halfSize = size / 2f;
@@ -82,6 +80,7 @@ public class Noise : MonoBehaviour
                 }
 
                 noiseMap[x, y] = noiseHeight;
+
             }
 
         // Normalize noise map to a positive spectrum
