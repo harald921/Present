@@ -43,6 +43,11 @@
 - In order to let trees look like they have height, use the Unity sprite packer bullcrap to render them, and stop rendering them if they are not visible to the player
 - Characters will be component based so that the player theoretically can control any character that exist in the world.
 
+- The game should probably have an update manager, which does the following in order:
+	1) Take input
+	2) Do the game logic from the input
+	3) Update the TileMaps
+
 
 
 
