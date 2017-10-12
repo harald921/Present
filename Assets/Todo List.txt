@@ -24,9 +24,6 @@
 	- Create a way to preview noise in a 1:10 scale or something
 - Implement basic biomes
 
-// Rotating sprites
-- Figure out how to rotate sprites in the tilemap shader
-
 // Other graphics
 - Figure out how to properly calculate how tiles should affect eachother graphically when placed next to eachother. For example, water placed next to grass should have a slight patch of dirt in the direction of the grass in order to
   seamlessly blend in.
@@ -34,3 +31,12 @@
 
 // Dev and Debugging
 - Make it possible to pick a tile of choise and "paint" them using the cursor. This should purely affect the data layer.
+
+
+
+
+
+// Random thoughts of solutions
+- Rather than thinking of a system on how to rotate sprites, instead make all the different variants on the sheet.
+- Let biomes affect color of grass and tree tiles (etcetera) by sending in a "color texture" that tints the sprite
+- In order to let trees look like they have height, use the Unity sprite packer bullcrap to render them, and stop rendering them if they are not visible to the player
