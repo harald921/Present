@@ -6,7 +6,6 @@ Shader "Tilemap/Tilemap2D"
 		_DataMapSize("DataMapSize", Float) = 0				// The size of the data texture		
 
 		_SpriteSheet ("Sprite Sheet", 2D) = "black" {}		// The sprite sheet containing the sprites I want to use
-		_SpriteSheetSize("Sprite Sheet Size", Float) = 0
 	}
 
 	SubShader 
@@ -20,7 +19,7 @@ Shader "Tilemap/Tilemap2D"
 			sampler2D _DataMap;
 			float     _DataMapSize;
 			sampler2D _SpriteSheet;
-			float 	  _SpriteSheetSize;
+
 			struct vertexInput
 			{
 				float4 vertex   : POSITION;
@@ -44,9 +43,6 @@ Shader "Tilemap/Tilemap2D"
 				OUT.texcoord  = IN.texcoord * float2(1,-1);
 				OUT.texcoord2 = IN.texcoord * _DataMapSize;
 
-				float tileSize = _ScreenParams.x / (unity_OrthoParams.x * 2.0);
-				OUT.mip = max(0, log2(_SpriteSheetSize / 16.0 / tileSize) - 1.0);
-
 				return OUT;
 			}
 			
@@ -56,7 +52,7 @@ Shader "Tilemap/Tilemap2D"
 
 				index.xy = (floor(tex2D(_DataMap, OUT.texcoord) * 16.0) + frac(OUT.texcoord2)) * 0.0625;
 
-				return tex2Dlod(_SpriteSheet, fixed4(index, OUT.mip));
+				return tex2D(_SpriteSheet, index);
 			}
 			
 			ENDCG
