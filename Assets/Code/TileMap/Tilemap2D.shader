@@ -31,7 +31,6 @@ Shader "Tilemap/Tilemap2D"
 				float4 vertex    : SV_POSITION;
 				float2 texcoord  : TEXCOORD0;
 				float2 texcoord2 : TEXCOORD2;
-				fixed mip 		 : NORMAL;
 			};
 			
 			vertexOut vert(vertexInput IN)
