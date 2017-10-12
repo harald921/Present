@@ -5,6 +5,9 @@
   Every simulated tile in the game should be available in memory as a "Tile" class, which holds data such as: Base material, dropped items, and "furniture" (walls, doors, etc.)
 - Make a class that is a pure data layer of the game. Define every tile type, and let it have flags such as "impassable" or similar.
 - Create a method that takes in an enum (such as "TileType.Grass") and returns the "color value" of a random grass tile. This method should also handle rotating and such, whenever that is implemented.
+- Create a "TileSerializer" monobehaviour where you can define all the different tiles in the game. Do the same for floors, characters and all other stuff that needs to be defined.
+	- This can and probably should be moved to JSON later  
+
 
 // Graphics layers
 - Add 5 layers in total:
@@ -34,9 +37,32 @@
 
 
 
-
-
 // Random thoughts of solutions
 - Rather than thinking of a system on how to rotate sprites, instead make all the different variants on the sheet.
 - Let biomes affect color of grass and tree tiles (etcetera) by sending in a "color texture" that tints the sprite
 - In order to let trees look like they have height, use the Unity sprite packer bullcrap to render them, and stop rendering them if they are not visible to the player
+- Characters will be component based so that the player theoretically can control any character that exist in the world.
+
+
+
+
+
+
+// Code for mouse->tile 
+ if (Input.GetMouseButton(0))
+        {
+            RaycastHit hit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out hit, 100.0f))
+            {
+                Vector3 hitPosition = hit.transform.InverseTransformPoint(hit.point) + new Vector3(0.5f, 0.5f);
+
+                Vector2 hitTile = new Vector2(Mathf.FloorToInt(hitPosition.x * _chunkSize), Mathf.CeilToInt(hitPosition.y * _chunkSize));
+
+                Material tilemapMaterial = GetComponent<MeshRenderer>().material;
+                Texture2D dataTexture = (Texture2D)tilemapMaterial.GetTexture("_DataMap");
+
+                dataTexture.SetPixel((int)hitTile.x, -(int)hitTile.y, new Color(3 / _spriteCount.x, 0, 0, 0));
+                dataTexture.Apply();
+            }
+        }

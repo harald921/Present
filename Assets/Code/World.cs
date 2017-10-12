@@ -2,7 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class Chunk
+public class World
 {
-    // Has each of the tilemap layers
+	// Holds all loaded chunks
+    // Handles chunk loading
 }

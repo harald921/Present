@@ -2,49 +2,43 @@ using UnityEngine;
 
 public class Tilemap2D : MonoBehaviour
 {
-	[SerializeField] Texture2D spriteSheet;             // The Sprite Sheet
+    enum Sprites
+    {
+        Grass1,
+        Grass2,
+        Grass3,
+        Water,
+    }
 
-    [SerializeField] int _chunkSize      = 64;          // Amount of tiles on one axis of the chunk
-	[SerializeField] int _tileResolution = 8;           // Resolution of the tile graphics
+    const int _spriteCount = 16;  // Sprite sheets are currently limited to 16x16 sprites. Changes need to be made to shader if this is to be changed.
 
-    Vector2 _spriteCount;                               // Amount of sprites on each axis in the sprite sheet
+    [SerializeField] int _chunkSize        = 64;          // Amount of tiles on one axis of the chunk
+	[SerializeField] int _spriteResolution = 32;          // Resolution of the tile graphics
 
+    Material tileMapMaterial;
+
+    // Start, Update
     void Start ()
     {
-        // Calculate the dimensions of the sprite sheet
-        _spriteCount = new Vector2(spriteSheet.width / _tileResolution, spriteSheet.height / _tileResolution);  
-
-        // Create a data texture
-        Texture2D dataTexture = new Texture2D(_chunkSize, _chunkSize);
-        for (int x = 0; x <_chunkSize; x++)
-			for (int y = 0; y <_chunkSize; y++)
-				    dataTexture.SetPixel(x, y, new Color(Random.Range(0, 8) / _spriteCount.x ,0,0,0));
-
-        dataTexture.filterMode = FilterMode.Point;
-		dataTexture.Apply();
-
-        // Send the tilemap and the data texture to the material
-        Material tilemapMaterial = GetComponent<MeshRenderer>().material;
-
-		tilemapMaterial.SetTexture("_SpriteSheet", spriteSheet);
-		tilemapMaterial.SetTexture("_DataMap", dataTexture);
-		tilemapMaterial.SetFloat("_DataMapSize", dataTexture.width);
+        GetComponent<MeshRenderer>().material.SetTexture("_DataMap", CreateDataTexture(_chunkSize));
+        GetComponent<MeshRenderer>().material.SetFloat("_DataMapSize", _chunkSize);
 	}
 
-    void Update()
+    // External
+    static Color GetUVColor(Vector2 inSpriteCoords)
     {
-        if (Input.GetKey(KeyCode.Space))
-        {
-            Material tilemapMaterial = GetComponent<MeshRenderer>().material;
+        return new Color(inSpriteCoords.x / _spriteCount, inSpriteCoords.y / _spriteCount, 0, 0);
+    }
 
-            // Create a data texture
-            Texture2D dataTexture = (Texture2D)tilemapMaterial.GetTexture("_DataMap");
-            for (int x = 0; x < _chunkSize; x++)
-                for (int y = 0; y < _chunkSize; y++)
-                    dataTexture.SetPixel(x, y, new Color(Random.Range(0, 4) / _spriteCount.x, 0, 0, 0));
+    // Internal
+    Texture2D CreateDataTexture(int inTextureSize)
+    {
+        Texture2D dataTexture = new Texture2D(_chunkSize, _chunkSize);
 
-            dataTexture.Apply();
-        }
+        dataTexture.filterMode = FilterMode.Point;
+        dataTexture.Apply();
+
+        return dataTexture;
     }
 }
 
