@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Tilemap2D : MonoBehaviour
+public class TileMap2D : MonoBehaviour
 {
     enum Sprites
     {

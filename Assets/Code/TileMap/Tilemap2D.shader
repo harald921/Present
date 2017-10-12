@@ -1,4 +1,4 @@
-Shader "Tilemap/Tilemap2D" 
+Shader "TileMap/TileMap2D" 
 {
 	Properties 
 	{
