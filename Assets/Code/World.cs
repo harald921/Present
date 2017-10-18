@@ -2,8 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class World
+public class World : MonoBehaviour
 {
-	// Holds all loaded chunks
-    // Handles chunk loading
+    void Start()
+    {
+
+    }
 }
