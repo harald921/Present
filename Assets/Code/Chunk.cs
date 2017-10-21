@@ -4,5 +4,10 @@ using System.Collections.Generic;
 
 public class Chunk
 {
-    // Has each of the tilemap layers
+    Tile[,] tiles;
+
+    public Chunk(int inSize, float[,] inNoiseMap)
+    {
+        tiles = new Tile[inSize, inSize];
+    }
 }

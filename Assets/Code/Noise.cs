@@ -7,9 +7,7 @@ public class Noise : MonoBehaviour
     [System.Serializable]
     public struct Parameters
     {
-        public int size;
-
-        [Space(10)]
+        [HideInInspector] public int size;
 
         public int scale;
         public int octaves;
@@ -32,7 +30,6 @@ public class Noise : MonoBehaviour
     /* External Methods */
     public static float[,] Generate(Parameters inParameters, Vector2 inOffset)
     {
-        // Cache all the parameters
         int   size            = inParameters.size;
         int   scale           = inParameters.scale;
         int   octaves         = inParameters.octaves;
